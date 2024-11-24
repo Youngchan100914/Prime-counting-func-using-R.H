@@ -1,13 +1,13 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import math
-import mpmath as mp
 from scipy.special import expi
+
 
 """지수적분함수"""
 def Ei(x):
     result = expi(x)
     return result
+
 
 def prime_factorization(n):
     factors = {}
@@ -20,6 +20,7 @@ def prime_factorization(n):
     if n > 1:
         factors[n] = factors.get(n, 0) + 1
     return factors
+
 
 def moebius(n):
     if n == 1:
@@ -35,9 +36,13 @@ def moebius(n):
 
     return (-1) ** len(factors)
 
+
 """리만의 공식"""
+
+
 def Riemann_main(x, numbersums, numberzeros, numbertrivials):
     return sum([moebius(n)/n * Ei((1/n) * math.log(x, math.e)) for n in range(1, numbersums+1)])
+
 
 """비자명 영점"""
 zz = list(map(float, """14.134725142
@@ -100041,20 +100046,27 @@ zz = list(map(float, """14.134725142
   74920.259793259
   74920.827498994
 """.split("""
-  """)))  """더 추가하면 더 정확해짐"""
+  """)))
+"""더 추가하면 더 정확해짐"""
+
+
 def zeta_nontrivial_correction(x, numbersums, numberzeros, numbertrivials):
 
     n_dict = {n: [] for n in range(1, numbersums+1)}
     for n in range(1, numbersums+1):
-        if moebius(n) == 1:
+        m_n = moebius(n)
+        if m_n == 1:
             n_dict[n] = -sum([(1/n) * 2 * (Ei((0.5 + 1j*gamma) / n * math.log(x, math.e)).real) for gamma in zz])
-        elif moebius(n) == 0:
+        elif m_n == 0:
             n_dict[n] = 0
-        elif moebius(n) == -1:
+        elif m_n == -1:
             n_dict[n] = sum([(1/n) * 2 * (Ei((0.5 + 1j*gamma) / n * math.log(x, math.e)).real) for gamma in zz])
     return sum(n_dict.values())
 
+
 """자명한 영점"""
+
+
 def trivial_zeros_correction(x, numbersums, numberzeros, numbertrivials):
     n_dict = {n: [] for n in range(1, numbersums + 1)}
     for n in range(1, numbersums+1):
@@ -100065,21 +100077,24 @@ def trivial_zeros_correction(x, numbersums, numberzeros, numbertrivials):
         elif moebius(n) == -1:
             n_dict[n] = sum([(1/n) * Ei((-2*m/n) * math.log(x, math.e)) for m in range(1, numbertrivials+1)])
     return sum(n_dict.values())
+
+
 """pi_0(x)계산"""
+
+
 def pi_0(x, numbersums, numberzeros, numbertrivials):
     return sum([Riemann_main(x, numbersums, numberzeros, numbertrivials),
                 zeta_nontrivial_correction(x, numbersums, numberzeros, numbertrivials),
                 trivial_zeros_correction(x, numbersums, numberzeros, numbertrivials)])
+
+
 ln2 = math.log(2, math.e)
-print(2-math.log(2*math.pi, math.e)-math.log(3/4, math.e)/2-ln2/2)
+fi_x = 2-math.log(2*math.pi, math.e)-math.log(3/4, math.e)/2-ln2/2
 p = 0
-q = 0
 for r in zz:
     p += (2**(0.5+1j*r))/(0.5+1j*r)
     p += (2**(0.5-1j*r))/(0.5-1j*r)
-    q += (2*(2**0.5)*2**(1j*r))/(1+2j*r)
-    q += (2*(2**0.5)*2**(-1j*r))/(1-2j*r)
-print(p, q)
+print(f"Errors:±{(fi_x-p).real}")
 mindistance = 1
 maxdistance = int(input(">>>"))
 nontrivialzeros = len(zz)
